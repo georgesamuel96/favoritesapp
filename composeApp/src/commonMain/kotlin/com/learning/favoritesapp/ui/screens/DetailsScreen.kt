@@ -47,20 +47,17 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 class DetailsScreen(
-    private val movieId: String,
+    private val movie: Movie,
 ) : Screen {
     @Composable
     override fun Content() {
 
         val navigator = LocalNavigator.currentOrThrow
-        val movie = fakeMovies.find { it.id == movieId }
 
-        movie?.let {
-            DetailsScreenContent(
-                movie = movie, goBack = {
-                    navigator.pop()
-                })
-        }
+        DetailsScreenContent(
+            movie = movie, goBack = {
+                navigator.pop()
+            })
     }
 }
 
@@ -133,7 +130,7 @@ private fun DetailsScreenContent(
                         onClick = {
                             goBack()
                         },
-                    ){
+                    ) {
                         Icon(
                             painter = painterResource(Res.drawable.ic_back),
                             contentDescription = null,
@@ -171,7 +168,7 @@ private fun DetailsScreenContent(
                                 tint = Color.Unspecified,
                             )
                             Text(
-                                text = "${movie.year}",
+                                text = movie.year,
                                 style = TextStyle(
                                     color = Color(0xFFD4D4D8), fontWeight = FontWeight.W400
                                 ),

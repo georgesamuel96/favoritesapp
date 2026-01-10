@@ -50,7 +50,7 @@ class FavoritesScreen : Screen {
 
         FavoritesScreenContent(
             openDetailsScreen = {
-                navigator.push(DetailsScreen(it))
+//                navigator.push(DetailsScreen(it))
             },
             goBack = {
             navigator.pop()

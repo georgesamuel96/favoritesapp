@@ -93,7 +93,7 @@ fun MovieCard(movie: Movie, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "${movie.year}",
+                    text = movie.year,
                     style = TextStyle(
                         color = Color(0xFF71717B),
                         fontWeight = FontWeight.W400

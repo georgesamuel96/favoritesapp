@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 kotlin {
@@ -46,6 +47,17 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.coil.compose)
             implementation("io.coil-kt.coil3:coil-network-ktor3:3.3.0")
+
+            // Ktor client
+            implementation("io.ktor:ktor-client-core:3.1.0")
+            implementation("io.ktor:ktor-client-content-negotiation:3.1.0")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:3.1.0")
+
+            // Kotlinx Serialization
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+            implementation("cafe.adriel.voyager:voyager-screenmodel:1.0.0")
+
         }
         iosMain.dependencies {
             implementation("io.ktor:ktor-client-darwin:3.1.0")
