@@ -1,5 +1,6 @@
-package com.learning.favoritesapp.ui.screens
+package com.learning.favoritesapp.ui.screens.details
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,10 +33,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
+import com.learning.favoritesapp.data.repository.FavoritesRepository
 import com.learning.favoritesapp.model.Movie
 import com.learning.favoritesapp.model.fakeMovies
 import favoritesapp.composeapp.generated.resources.Res
@@ -45,6 +50,7 @@ import favoritesapp.composeapp.generated.resources.ic_star
 import favoritesapp.composeapp.generated.resources.ic_time
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.koinInject
 
 class DetailsScreen(
     private val movie: Movie,
@@ -53,9 +59,17 @@ class DetailsScreen(
     override fun Content() {
 
         val navigator = LocalNavigator.currentOrThrow
+        val repository: FavoritesRepository = koinInject()
+        val screenModel = rememberScreenModel {
+            DetailsScreenModel(movie, repository)
+        }
+        val isFavorite by screenModel.isFavorite.collectAsStateWithLifecycle()
 
         DetailsScreenContent(
-            movie = movie, goBack = {
+            movie = movie,
+            isFavorite = isFavorite,
+            onFavoriteClick = { screenModel.toggleFavorite() },
+            goBack = {
                 navigator.pop()
             })
     }
@@ -64,6 +78,8 @@ class DetailsScreen(
 @Composable
 private fun DetailsScreenContent(
     movie: Movie,
+    isFavorite: Boolean,
+    onFavoriteClick: () -> Unit,
     goBack: () -> Unit,
 ) {
     Column(
@@ -236,14 +252,16 @@ private fun DetailsScreenContent(
         }
         Button(
             modifier = Modifier.padding(24.dp),
-            onClick = {},
+            onClick = onFavoriteClick,
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xff7F22FE)
-            )
+                containerColor = if (isFavorite) Color.Transparent else Color(0xff7F22FE)
+            ),
+            border = if (isFavorite) BorderStroke(1.dp, Color(0xFFE4E4E7)) else null
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(
@@ -254,10 +272,11 @@ private fun DetailsScreenContent(
                 Icon(
                     painter = painterResource(Res.drawable.ic_save),
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = if (isFavorite) Color(0xFFFF6B6B) else Color.White,
                 )
                 Text(
-                    text = "Add to Favorites"
+                    text = if (isFavorite) "Remove from Favorites" else "Add to Favorites",
+                    color = if (isFavorite) Color(0xFFE4E4E7) else Color.White
                 )
             }
         }
@@ -270,6 +289,8 @@ private fun DetailsScreenPreview() {
     MaterialTheme {
         DetailsScreenContent(
             movie = fakeMovies[0],
+            isFavorite = false,
+            onFavoriteClick = {},
             goBack = {},
         )
     }

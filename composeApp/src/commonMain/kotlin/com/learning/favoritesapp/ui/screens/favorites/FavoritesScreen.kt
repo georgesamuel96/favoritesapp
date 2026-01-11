@@ -1,4 +1,4 @@
-package com.learning.favoritesapp.ui.screens
+package com.learning.favoritesapp.ui.screens.favorites
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,10 +18,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,37 +33,51 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.learning.favoritesapp.model.Movie
 import com.learning.favoritesapp.model.fakeMovies
 import com.learning.favoritesapp.ui.components.MovieCard
 import com.learning.favoritesapp.ui.components.ToolbarComponent
+import com.learning.favoritesapp.ui.screens.details.DetailsScreen
 import favoritesapp.composeapp.generated.resources.Res
 import favoritesapp.composeapp.generated.resources.ic_save
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.koinInject
 
 class FavoritesScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val screenModel = getScreenModel<FavoritesScreenModel>()
+        val uiState by screenModel.uiState.collectAsStateWithLifecycle()
 
         FavoritesScreenContent(
+            uiState = uiState,
             openDetailsScreen = {
-//                navigator.push(DetailsScreen(it))
+                navigator.push(DetailsScreen(it))
             },
             goBack = {
-            navigator.pop()
-        })
+                navigator.pop()
+            },
+            goToExplore = {
+                navigator.pop()
+            }
+        )
     }
 }
 
 @Composable
 private fun FavoritesScreenContent(
+    uiState: FavoritesUiState,
     goBack: () -> Unit,
-    openDetailsScreen: (movieId: String) -> Unit,
+    openDetailsScreen: (Movie) -> Unit,
+    goToExplore: () -> Unit,
 ) {
     var emptyList = false
 
@@ -74,11 +90,22 @@ private fun FavoritesScreenContent(
             goBack = goBack,
         )
 
-        if (emptyList) {
-            EmptyListComponent(goBack = goBack)
+        if (uiState.isLoading) {
+            // Show loading
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (uiState.favorites.isEmpty()) {
+            EmptyListComponent(goBack = goToExplore)
         } else {
             Spacer(modifier = Modifier.height(24.dp))
-            MovieListComponent(movieList = fakeMovies.subList(0, 3), openDetailsScreen = openDetailsScreen)
+            MovieListComponent(
+                movieList = uiState.favorites,
+                openDetailsScreen = openDetailsScreen
+            )
         }
     }
 }
@@ -138,7 +165,7 @@ private fun EmptyListComponent(
                 contentColor = Color.Black
             ),
             shape = RoundedCornerShape(8.dp)
-        ){
+        ) {
             Text(
                 text = "Explore Movies",
             )
@@ -147,7 +174,10 @@ private fun EmptyListComponent(
 }
 
 @Composable
-private fun MovieListComponent(movieList: List<Movie>, openDetailsScreen: (movieId: String) -> Unit,) {
+private fun MovieListComponent(
+    movieList: List<Movie>,
+    openDetailsScreen: (movie: Movie) -> Unit,
+) {
     LazyVerticalGrid(
         modifier = Modifier
             .padding(horizontal = 24.dp),
@@ -159,7 +189,7 @@ private fun MovieListComponent(movieList: List<Movie>, openDetailsScreen: (movie
             MovieCard(
                 movie = it,
                 onClick = {
-                    openDetailsScreen(it.id)
+                    openDetailsScreen(it)
                 }
             )
         }
@@ -171,6 +201,10 @@ private fun MovieListComponent(movieList: List<Movie>, openDetailsScreen: (movie
 @Composable
 private fun FavoritesScreenPreview() {
     MaterialTheme {
-        FavoritesScreenContent(goBack = {}, openDetailsScreen = {})
+        FavoritesScreenContent(
+            goBack = {},
+            openDetailsScreen = {},
+            uiState = FavoritesUiState(),
+            goToExplore = {})
     }
 }

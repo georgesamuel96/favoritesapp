@@ -45,8 +45,6 @@ fun MovieCard(movie: Movie, onClick: () -> Unit) {
                 onClick()
             }
     ) {
-        println(movie.posterUrl)
-
         AsyncImage(
             model = movie.posterUrl,
             modifier = Modifier.fillMaxWidth()
@@ -56,14 +54,10 @@ fun MovieCard(movie: Movie, onClick: () -> Unit) {
             onState = {state ->
                 when(state){
                     is AsyncImagePainter.State.Loading -> {
-                        println("Loading")
                     }
                     is AsyncImagePainter.State.Success -> {
-                        println("Success")
                     }
                     is AsyncImagePainter.State.Error -> {
-                        println("Error")
-                        println(state.result.throwable)
                     }
                     else -> {}
                 }

@@ -1,0 +1,26 @@
+CREATE TABLE FavoriteMovie (
+    id TEXT NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    genre TEXT NOT NULL,
+    year TEXT NOT NULL,
+    duration TEXT NOT NULL,
+    rating REAL NOT NULL,
+    posterUrl TEXT NOT NULL,
+    synopsis TEXT NOT NULL
+);
+
+getAllFavorites:
+SELECT * FROM FavoriteMovie;
+
+getFavoriteById:
+SELECT * FROM FavoriteMovie WHERE id = ?;
+
+insertFavorite:
+INSERT OR REPLACE INTO FavoriteMovie(id, title, genre, year, duration, rating, posterUrl, synopsis)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteFavorite:
+DELETE FROM FavoriteMovie WHERE id = ?;
+
+isFavorite:
+SELECT COUNT(*) FROM FavoriteMovie WHERE id = ?;

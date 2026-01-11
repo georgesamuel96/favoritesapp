@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     kotlin("plugin.serialization") version "2.1.0"
+    id("app.cash.sqldelight")
 }
 
 kotlin {
@@ -32,6 +33,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
 
             implementation("io.ktor:ktor-client-android:3.1.0")
+            implementation("app.cash.sqldelight:android-driver:2.0.2")
 
         }
         commonMain.dependencies {
@@ -58,9 +60,19 @@ kotlin {
 
             implementation("cafe.adriel.voyager:voyager-screenmodel:1.0.0")
 
+            implementation("app.cash.sqldelight:runtime:2.0.2")
+            implementation("app.cash.sqldelight:coroutines-extensions:2.0.2")
+
+            // Koin
+            implementation("io.insert-koin:koin-core:3.5.6")
+            implementation("io.insert-koin:koin-compose:1.1.5")
+            implementation("cafe.adriel.voyager:voyager-koin:1.0.0")
+
         }
         iosMain.dependencies {
             implementation("io.ktor:ktor-client-darwin:3.1.0")
+            implementation("app.cash.sqldelight:native-driver:2.0.2")
+
         }
     }
 }
@@ -96,3 +108,10 @@ dependencies {
     debugImplementation(compose.uiTooling)
 }
 
+sqldelight {
+    databases {
+        create("FavoritesDatabase") {
+            packageName.set("com.learning.favoritesapp.db")
+        }
+    }
+}

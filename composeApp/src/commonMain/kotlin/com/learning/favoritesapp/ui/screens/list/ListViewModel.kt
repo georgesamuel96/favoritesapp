@@ -9,8 +9,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ListViewModel: ScreenModel {
-    private val repository = MovieRepository()
+class ListViewModel(
+    private val repository: MovieRepository
+): ScreenModel {
 
     private val _uiState = MutableStateFlow(ListUiState())
     val uiState = _uiState.asStateFlow()

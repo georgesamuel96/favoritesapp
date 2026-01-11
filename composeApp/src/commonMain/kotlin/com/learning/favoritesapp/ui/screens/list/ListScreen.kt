@@ -32,9 +32,10 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.learning.favoritesapp.model.Movie
 import com.learning.favoritesapp.ui.components.MovieCard
 import com.learning.favoritesapp.ui.components.ToolbarComponent
-import com.learning.favoritesapp.ui.screens.DetailsScreen
-import com.learning.favoritesapp.ui.screens.FavoritesScreen
+import com.learning.favoritesapp.ui.screens.details.DetailsScreen
+import com.learning.favoritesapp.ui.screens.favorites.FavoritesScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import cafe.adriel.voyager.koin.getScreenModel
 
 class ListScreen : Screen {
 
@@ -42,7 +43,7 @@ class ListScreen : Screen {
     override fun Content() {
 
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = rememberScreenModel { ListViewModel() }
+        val screenModel = getScreenModel<ListViewModel>()
         val listUiState by screenModel.uiState.collectAsState()
 
         ListScreenContent(
